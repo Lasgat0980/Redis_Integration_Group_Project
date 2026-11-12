@@ -1,8 +1,8 @@
-\# Redis Integration Group Project
+# Redis Integration Group Project
 
 
 
-\## Application Description
+## Application Description
 
 
 
@@ -18,7 +18,7 @@ The application uses Redis pipelines to import large amounts of data more effici
 
 
 
-\## Technologies Used
+## Technologies Used
 
 
 
@@ -36,7 +36,7 @@ The application uses Redis pipelines to import large amounts of data more effici
 
 
 
-\## Installation and Setup
+## Installation and Setup
 
 
 
@@ -64,7 +64,7 @@ The application uses Redis pipelines to import large amounts of data more effici
 
 
 
-\## Application Menu
+## Application Menu
 
 
 
@@ -86,7 +86,7 @@ The application provides the following options:
 
 
 
-\## Current Features
+## Current Features
 
 
 
@@ -104,7 +104,7 @@ The application provides the following options:
 
 
 
-\## Future Development
+## Future Development
 
 
 
