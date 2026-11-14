@@ -11,7 +11,8 @@ try:
         print("Successfully connected to Redis!")
 except redis.ConnectionError:
     print("Could not connect to Redis.")
-    
+
+
 # Import JSON data into Redis
 def import_json(filename):
     try:
@@ -25,11 +26,12 @@ def import_json(filename):
 
                 pipe.set(key, json.dumps(data))
                 count += 1
+
                 if count % 1000 == 0:
                     pipe.execute()
 
             pipe.execute()
-            
+
         print(f"Successfully imported {count} records from {filename}.")
 
     except FileNotFoundError:
@@ -37,12 +39,13 @@ def import_json(filename):
 
     except json.JSONDecodeError:
         print(f"Invalid JSON data in {filename}")
-        
+
 
 # CREATE - Add a new record to Redis
 def create_record(key, value):
     r.set(key, json.dumps(value))
     print(f"Record '{key}' created successfully.")
+
 
 # READ - Retrieve a record from Redis
 def read_record(key):
@@ -52,6 +55,7 @@ def read_record(key):
         print(json.loads(value))
     else:
         print(f"Record '{key}' not found.")
+
 
 # UPDATE - Modify an existing record in Redis
 def update_record(key, value):
@@ -70,6 +74,86 @@ def delete_record(key):
     else:
         print(f"Record '{key}' not found.")
 
+
+# FEATURE 1 - Most Common Event Types
+def event_type_analysis():
+    event_counts = {}
+
+    for key in r.keys("*"):
+        try:
+            event = json.loads(r.get(key))
+
+            event_type = event.get("type")
+
+            if event_type:
+                event_counts[event_type] = event_counts.get(event_type, 0) + 1
+
+        except:
+            continue
+
+    print("\nMost Common Event Types")
+
+    for event_type, count in sorted(
+            event_counts.items(),
+            key=lambda x: x[1],
+            reverse=True):
+        print(f"{event_type}: {count}")
+
+
+# FEATURE 2 - Top Contributors
+def top_contributors():
+    contributors = {}
+
+    for key in r.keys("*"):
+        try:
+            event = json.loads(r.get(key))
+
+            actor = event.get("actor", {})
+            username = actor.get("login")
+
+            if username:
+                contributors[username] = contributors.get(username, 0) + 1
+
+        except:
+            continue
+
+    print("\nTop Contributors")
+
+    for user, count in sorted(
+            contributors.items(),
+            key=lambda x: x[1],
+            reverse=True)[:10]:
+
+        print(f"{user}: {count}")
+
+
+# FEATURE 3 - Most Active Repositories
+def active_repositories():
+    repos = {}
+
+    for key in r.keys("*"):
+        try:
+            event = json.loads(r.get(key))
+
+            repo = event.get("repo", {})
+            repo_name = repo.get("name")
+
+            if repo_name:
+                repos[repo_name] = repos.get(repo_name, 0) + 1
+
+        except:
+            continue
+
+    print("\nMost Active Repositories")
+
+    for repo, count in sorted(
+            repos.items(),
+            key=lambda x: x[1],
+            reverse=True)[:10]:
+
+        print(f"{repo}: {count}")
+
+
 # Display the main menu
 def display_menu():
     print("\nGitHub Activity Tracker")
@@ -78,13 +162,17 @@ def display_menu():
     print("3. Read a Record")
     print("4. Update a Record")
     print("5. Delete a Record")
-    print("6. Exit")
+    print("6. Event Type Analysis")
+    print("7. Top Contributors")
+    print("8. Active Repositories")
+    print("9. Exit")
+
 
 # Allow users to select an option
 def main():
     while True:
         display_menu()
-        choice = input("Enter your choice (1-6): ")
+        choice = input("Enter your choice (1-9): ")
 
         if choice == "1":
             filename = input("Enter JSON filename: ")
@@ -113,18 +201,28 @@ def main():
 
             except json.JSONDecodeError:
                 print("Invalid JSON format. Please try again.")
+
         elif choice == "5":
             key = input("Enter record key: ")
             delete_record(key)
 
         elif choice == "6":
+            event_type_analysis()
+
+        elif choice == "7":
+            top_contributors()
+
+        elif choice == "8":
+            active_repositories()
+
+        elif choice == "9":
             print("Exiting application.")
             break
 
         else:
             print("Invalid choice. Please try again.")
 
+
 # Start the application
 if __name__ == "__main__":
     main()
-    
